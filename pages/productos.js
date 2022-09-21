@@ -1,0 +1,11 @@
+import Layout from "../components/Layout";
+
+const Productos = () => {
+  return ( 
+    <Layout>
+      <h1 className="text-gray-800 font-light text-2xl">Productos</h1>
+    </Layout>
+   );
+}
+ 
+export default Productos;
