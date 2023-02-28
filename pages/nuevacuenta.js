@@ -67,7 +67,7 @@ const NuevaCuenta = () => {
         setTimeout(() => {
           guardarMensaje(null);
           router.push("/login");
-        }, 3000);
+        }, 1500);
 
         //redirigir a su sesion
       } catch (error) {
@@ -75,7 +75,7 @@ const NuevaCuenta = () => {
 
         setTimeout(() => {
           guardarMensaje(null);
-        }, 3000);
+        }, 1000);
       }
     },
   });
@@ -90,19 +90,19 @@ const NuevaCuenta = () => {
 
   return (
     <Layout>
-      <h1 className="text-white font-light text-2xl text-center">
+      <h1 className="font-extralight text-3xl text-center text-indigo-500">
         Crear Nueva Cuenta
       </h1>
       {mensaje && mostrarMensaje()}
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-sm">
           <form
-            className="bg-white rounded shadow-md px-8 pt-6 pb-8 mb-4"
+            className="bg-gradient-to-b from-indigo-500 to-purple-600 rounded-lg shadow-md px-8 pt-6 pb-8 mb-4"
             onSubmit={formik.handleSubmit}
           >
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="nombre"
               >
                 Nombre
@@ -126,7 +126,7 @@ const NuevaCuenta = () => {
 
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="apellido"
               >
                 Apellido
@@ -150,7 +150,7 @@ const NuevaCuenta = () => {
 
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="email"
               >
                 Email
@@ -174,7 +174,7 @@ const NuevaCuenta = () => {
 
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="password"
               >
                 Password
@@ -198,7 +198,7 @@ const NuevaCuenta = () => {
 
             <input
               type="submit"
-              className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-slate-900 hover:cursor-pointer"
+              className="bg-transparent w-full mt-5 p-2 rounded-3xl text-white uppercase hover:bg-purple-700 hover:cursor-pointer"
               value="Crear Cuenta"
             />
           </form>

@@ -12,18 +12,21 @@ import {
 const PedidoState = ({children}) => {
 
     // State de Pedidos
+    //Contiene al cliente, los productos seleccionados y el total a pagar
     const initialState = {
         cliente: {},
         productos: [],
         total: 0
     }
 
+    //dispatch es una funcion que se conecta con  los types 
+    //Se le pasa la informacion que va a modificar
+    //Al reducer se le pasa el PedidoReducer y el estado inicial
     const [ state, dispatch ] = useReducer(PedidoReducer, initialState);
 
     // Modifica el Cliente
     const agregarCliente = cliente => {
         // console.log(cliente);
-
         dispatch({
             type: SELECCIONAR_CLIENTE,
             payload: cliente
@@ -64,7 +67,8 @@ const PedidoState = ({children}) => {
         })
     }
 
-
+    //PedidoState va a contener al context
+    //Esta dentro de apollo para acceder a sus funciones
     return (
         <PedidoContext.Provider
             value={{

@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
+import emailjs, { send, EmailJSResponseStatus } from "@emailjs/nodejs";
 
 const NUEVO_CLIENTE = gql`
   mutation nuevoCliente($input: ClienteInput) {
@@ -85,9 +86,28 @@ const NuevoCliente = () => {
             },
           },
         });
-        // console.log(data.nuevoCliente);
+        console.log(process.env.NEXT_PUBLIC_EMAIL_TEMPLATE);
+        console.log("default_service");
+        const { response } = await emailjs.send(
+          process.env.NEXT_PUBLIC_EMAIL_SERVICE,
+          process.env.NEXT_PUBLIC_EMAIL_TEMPLATE,
+          valores,
+          {
+            publicKey: process.env.NEXT_PUBLIC_EMAIL_PUBLIC_KEY,
+            privateKey: process.env.NEXT_PUBLIC_EMAIL_PRIVATE_KEY, // optional, highly recommended for security reasons
+          }
+        );
+
+
+        //console.log(data.nuevoCliente);
         router.push("/"); // redireccionar hacia clientes
       } catch (error) {
+        if (error instanceof EmailJSResponseStatus) {
+          console.log("EMAILJS FAILED...", err);
+          return;
+        }
+
+        console.log("ERROR", err);
         guardarMensaje(error.message.replace("GraphQL error: ", ""));
 
         setTimeout(() => {

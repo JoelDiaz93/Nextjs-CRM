@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { gql, useMutation } from "@apollo/client";
 import Swal from "sweetalert2";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const ACTUALIZAR_PEDIDO = gql`
   mutation actualizarPedido($id: ID!, $input: PedidoInput) {
@@ -16,7 +18,7 @@ const ELIMINAR_PEDIDO = gql`
 `;
 
 const OBTENER_PEDIDOS = gql`
-  query obtenerPedidosVendedor {
+  query ObtenerPedidosVendedor {
     obtenerPedidosVendedor {
       id
     }
@@ -92,6 +94,53 @@ const Pedido = ({ pedido }) => {
     }
   };
 
+  const descargarPedido = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(40);
+    doc.setFont("helvetica", "bold");
+    doc.text("CRM PEDIDOS", 20, 30);
+    doc.setFontSize(25);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pedido: " + id, 20, 42);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Estado: " + estado, 20, 50);
+    const docWidth = doc.internal.pageSize.getWidth();
+    const docHeight = doc.internal.pageSize.getHeight();
+    doc.line(0, 56, docWidth, 56);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Cliente: ", 20, 70);
+    doc.text(nombre + " " + apellido, 50, 70);
+    doc.text("Email: ", 20, 80);
+    doc.text(email, 50, 80);
+    doc.text("Telefono: ", 20, 90);
+    doc.text(telefono, 50, 90);
+    const columns = [
+      { title: "Cantidad", dataKey: "Cantidad" },
+      { title: "Producto", dataKey: "Producto" },
+      { title: "Precio", dataKey: "Precio" },
+    ];
+    const rows = [];
+    pedido.pedido.forEach((articulo) => {
+      const articuloData = [
+        articulo.cantidad,
+        articulo.nombre,
+        articulo.precio,
+      ];
+      rows.push(articuloData);
+    });
+    autoTable(
+      doc,{
+        head: [columns],
+        body: rows,
+        startY: 100
+      }
+    );
+    doc.text("Total: " + total.toFixed(2), 147, (doc).lastAutoTable.finalY + 10);
+    doc.save(`${nombre}-${apellido}`);
+  };
+
   const confirmarEliminarPedido = () => {
     Swal.fire({
       title: "¿Deseas eliminar a este pedido?",
@@ -123,8 +172,65 @@ const Pedido = ({ pedido }) => {
     <div
       className={` ${clase} border-t-4 mt-4 bg-white rounded p-6 md:grid md:grid-cols-2 md:gap-4 shadow-lg`}
     >
-      <div>
-        <p className="font-bold text-gray-800">
+      <div className="col-span-1 flex flex-col justify-center items-center">
+        {estadoPedido === "COMPLETADO" ? (
+          <svg
+            className="w-20 h-20 text-green-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        ) : estadoPedido === "PENDIENTE" ? (
+          <svg
+            className="w-20 h-20 text-yellow-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+          </svg>
+        ) : (
+          <svg
+            className="w-20 h-20 text-red-800"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        )}
+
+        <h2 className="text-gray-800 text-center font-bold text-xl mt-10">
+          Estado Pedido:
+        </h2>
+        <select
+          className="mt-4 border-2 appearance-none bg-white border-blue-600 text-black p-2 text-center rounded leading-tight focus:outline-none focus:bg-white uppercase text-xs font-bold mb-2
+          "
+          value={estadoPedido}
+          onChange={(e) => cambiarEstadoPedido(e.target.value)}
+        >
+          <option value="COMPLETADO">COMPLETADO</option>
+          <option value="PENDIENTE">PENDIENTE</option>
+          <option value="CANCELADO">CANCELADO</option>
+        </select>
+      </div>
+
+      <div className="col-span-1 mt-8 md:mt-4">
+        <p className="font-bold text-xl text-gray-800 mb-6">
           Cliente: {nombre} {apellido}{" "}
         </p>
 
@@ -162,20 +268,45 @@ const Pedido = ({ pedido }) => {
           </p>
         )}
 
-        <h2 className="text-gray-800 font-bold mt-10">Estado Pedido:</h2>
-
-        <select
-          className="mt-2 appearance-none bg-blue-600 border border-blue-600 text-white p-2 text-center rounded leading-tight focus:outline-none focus:bg-blue-600 focus:border-blue-500 uppercase text-xs font-bold "
-          value={estadoPedido}
-          onChange={(e) => cambiarEstadoPedido(e.target.value)}
-        >
-          <option value="COMPLETADO">COMPLETADO</option>
-          <option value="PENDIENTE">PENDIENTE</option>
-          <option value="CANCELADO">CANCELADO</option>
-        </select>
+        <div className="flex mt-4 gap-2 justify-between">
+          <button
+            className="w-full border-2 uppercase text-xs font-bold text-center border-lime-500 px-5 py-2 text-black rounded leading-tight appearance-none"
+            onClick={() => descargarPedido()}
+          >
+            Descargar Pedido
+            <svg
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              className="w-4 h-4 ml-2 inline-block"
+            >
+              <path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+          </button>
+          <button
+            className="w-full border-2 uppercase text-xs font-bold text-center border-red-800 px-5 py-2 text-black rounded leading-tight appearance-none"
+            onClick={() => confirmarEliminarPedido()}
+          >
+            Eliminar Pedido
+            <svg
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              className="w-4 h-4 ml-2 inline-block"
+            >
+              <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <div>
+      <div className="col-span-2">
         <h2 className="text-gray-800 font-bold mt-2">Resumen del Pedido</h2>
         {pedido.pedido.map((articulo) => (
           <div key={articulo.id} className="mt-4">
@@ -192,24 +323,6 @@ const Pedido = ({ pedido }) => {
           Total a pagar:
           <span className="font-light"> $ {total}</span>
         </p>
-
-        <button
-          className="uppercase text-xs font-bold  flex items-center mt-4 bg-red-800 px-5 py-2 inline-block text-white rounded leading-tight"
-          onClick={() => confirmarEliminarPedido()}
-        >
-          Eliminar Pedido
-          <svg
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            className="w-4 h-4 ml-2"
-          >
-            <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </button>
       </div>
     </div>
   );

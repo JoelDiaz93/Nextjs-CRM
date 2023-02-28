@@ -11,6 +11,7 @@ const OBTENER_PEDIDOS = gql`
         id
         cantidad
         nombre
+        precio
       }
       cliente {
         id
@@ -33,7 +34,7 @@ const Pedidos = () => {
   
   if (loading) return "Cargando...";
 
-  console.log(data);
+  //console.log(data);
   const { obtenerPedidosVendedor } = data;
 
   return (

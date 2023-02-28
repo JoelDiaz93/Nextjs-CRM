@@ -22,9 +22,8 @@ const AsignarProductos = () => {
     const [ productos, setProductos ] = useState([]);
 
     // Context de pedidos
-    const pedidoContext = useContext(PedidoContext);
-    const { agregarProducto } = pedidoContext;
-
+    // traemos la funcion agregar productos
+    const {agregarProducto} = useContext(PedidoContext);
 
     // consulta a la base de datos
     const { data, loading, error } = useQuery(OBTENER_PRODUCTOS);

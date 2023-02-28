@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { gql, useMutation } from "@apollo/client";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const AUTENTICAR_USUARIO = gql`
   mutation autenticarUsuario($input: AutenticarInput) {
@@ -48,15 +49,16 @@ const Login = () => {
         guardarMensaje("Autenticando....");
 
         //Almacenar el token en localstorage
-        const { token } = data.autenticarUsuario;
-        localStorage.setItem("token", token);
+        setTimeout(() => {
+          const { token } = data.autenticarUsuario;
+          localStorage.setItem("token", token);
+        }, 1000);
 
         //Redirigir al ususaro
         setTimeout(() => {
           guardarMensaje(null);
-          router.push('/');
+          router.push("/");
         }, 2000);
-
       } catch (error) {
         //console.log(error);
         guardarMensaje(error.message.replace("GraphQL error: ", ""));
@@ -78,23 +80,23 @@ const Login = () => {
 
   return (
     <Layout>
-      <h1 className="text-white font-light text-2xl text-center">Login</h1>
+      <h1 className="font-extralight text-4xl text-center text-indigo-200">Bienvenido</h1>
       {mensaje && mostrarMensaje()}
-      <div className="flex justify-center mt-5">
-        <div className="w-full max-w-sm">
+      <div className="mt-5 grid grid-cols-1 grid-rows-2">
+        <div className="place-self-center w-full max-w-sm">
           <form
-            className="bg-white rounded shadow-md px-8 pt-6 pb-8 mb-4"
+            className="bg-gradient-to-b from-indigo-500 to-purple-600 rounded-lg shadow-xl px-8 pt-6 pb-8 mb-4 h-max"
             onSubmit={formik.handleSubmit}
           >
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="email"
               >
                 Email
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline focus:outline-blue-300"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline focus:outline-blue-500"
                 id="email"
                 type="email"
                 placeholder="Email Usuario"
@@ -105,7 +107,7 @@ const Login = () => {
             </div>
 
             {formik.touched.email && formik.errors.email ? (
-              <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-3">
+              <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-2">
                 <p className="font-bold">Error</p>
                 <p>{formik.errors.email}</p>
               </div>
@@ -113,13 +115,13 @@ const Login = () => {
 
             <div className="mb-4">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-gray-900 text-sm font-bold mb-2"
                 htmlFor="password"
               >
                 Password
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline focus:outline-blue-300"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline focus:outline-blue-500"
                 id="password"
                 type="password"
                 placeholder="Password Usuario"
@@ -138,10 +140,15 @@ const Login = () => {
 
             <input
               type="submit"
-              className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-slate-900 hover:cursor-pointer"
+              className="bg-transparent w-full mt-5 p-2 rounded-3xl text-white uppercase hover:bg-purple-700 hover:cursor-pointer"
               value="Iniciar sesion"
             />
           </form>
+        </div>
+        <div className="row-start-3 align-bottom items-end">
+          <Link href="/nuevacuenta">
+            <a className="block text-center hover:text-purple-600">Registrarse</a>
+          </Link>
         </div>
       </div>
     </Layout>

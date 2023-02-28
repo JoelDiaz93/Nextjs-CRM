@@ -5,7 +5,7 @@ import {
     ACTUALIZAR_TOTAL
 } from '../../types'
 
-
+//Siempre se pasa un state y un action
 export default ( state, action ) => {
     switch(action.type) {
         case SELECCIONAR_CLIENTE: 
